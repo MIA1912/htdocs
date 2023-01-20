@@ -1,0 +1,12 @@
+prettier [sourcepathcode] --write
+
+
+Superglobals
+-> Semua nya adalah array associative
+* $_GET
+* $_POST
+* $_REQUEST
+* $_SESSION
+* $_COOKIE
+* $_SERVER
+* $_ENV
