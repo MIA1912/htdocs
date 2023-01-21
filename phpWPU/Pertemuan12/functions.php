@@ -1,12 +1,3 @@
-<style>
-    .warning {
-        background-color: red;
-        padding: 10px;
-        width: max-content;
-        color: white;
-    }
-</style>
-
 <?php
 // koneksi ke database
 $conn = mysqli_connect("localhost", "root", "ilham1912aulia", "phpdasar");
@@ -43,7 +34,16 @@ function ubah($data)
     $nrp = htmlspecialchars($data['nrp']);
     $email = htmlspecialchars($data['email']);
     $jurusan = htmlspecialchars($data['jurusan']);
+    $gambarLama = htmlspecialchars($data['gambarLama']);
+
+    // cek apakah user pilih gambar baru atau tidak
     $gambar = htmlspecialchars($data['gambar']);
+    if ($_FILES['gambar']['error'] === 4) {
+        $gambar = $gambarLama;
+    } else {
+        $gambar = upload();
+    }
+
 
     $query =
         "UPDATE
@@ -55,7 +55,7 @@ SET
     jurusan = '$jurusan',
     gambar = '$gambar'
 WHERE
-    id = $id;";
+    id = $id";
 
 
     mysqli_query($conn, $query);
@@ -66,22 +66,18 @@ function tambah($data)
 {
     global $conn;
     // ambil data dari tiap elemen dalam form
-    $nama = $data["nama"];
-    $nrp = $data["nrp"];
-    $email = $data["email"];
-    $jurusan = $data["jurusan"];
-    $gambar = $data["gambar"];
+    $nama = htmlspecialchars($data["nama"]);
+    $nrp =  htmlspecialchars($data["nrp"]);
+    $email =    htmlspecialchars($data["email"]);
+    $jurusan =  htmlspecialchars($data["jurusan"]);
 
+    // jalankan function upload gambar
+    $gambar = upload();
+    if (!$gambar) {
+        return false;
+    }
 
-    if ($nama == "" || $nrp == "" || $gambar == "" || $email == "" || $jurusan == "") {
-        echo
-        '
-        <h3 class="warning"> 
-                Tolong masukkan data anda dengan lengkap !
-        </h3>
-        ';
-    } else {
-        $query = "INSERT INTO
+    $query = "INSERT INTO
         mahasiswa (nama, nrp, email, jurusan, gambar)
         VALUES
         (
@@ -92,9 +88,9 @@ function tambah($data)
             '$gambar'
         );";
 
-        mysqli_query($conn, $query);
-        return mysqli_affected_rows($conn);
-    }
+    mysqli_query($conn, $query);
+    return mysqli_affected_rows($conn);
+
     // query insert data
     // $query = "INSERT INTO
     //     mahasiswa (nama, nrp, email, jurusan, gambar)
@@ -118,4 +114,58 @@ function cari($keyword)
     jurusan LIKE '%$keyword%'
     ";
     return query($query);
+}
+
+function upload()
+{
+    $namaFile = $_FILES['gambar']['name'];
+    $sizeFile =  $_FILES['gambar']['size'];
+    $error = $_FILES['gambar']['error'];
+    $tmpName = $_FILES['gambar']['tmp_name'];
+
+
+    // * cek apakah tidak ada gambar yang di upload
+    //! 4 artinya tidak ada gambar yang di upload
+    if ($error === 4) {
+        echo
+        '<script>
+        alert("pilih gambar terlebih dahulu")
+        </script> ;';
+        return false;
+    }
+
+    // * cek apakah yang diupload adalah gambar
+    $ekstensiGambarValid = ["jpg", "png", "jpeg"];
+    // explode adalah pemecah string menjadi array
+    $ekstensiGambar = explode('.', $namaFile);
+    // mengambil data di akhir, jika nama file photo.ilham.jpg
+    $ekstensiGambar = strtolower(end($ekstensiGambarValid));
+
+
+    if (!in_array($ekstensiGambar, $ekstensiGambarValid)) {
+        echo
+        "<script>
+        alert('yang anda upload bukan gambar')
+        </script> ;";
+        return false;
+    }
+
+    if ($sizeFile > 1000000) {
+        echo
+        "<script>
+        alert('ukuran gambar terlalu besar')
+        </script> ;";
+        return false;
+    }
+
+    // lolos pengecekan, gambar siap di jalankan
+
+    // generate nama gambar baru
+    $namaFileBaru = uniqid();
+    $namaFileBaru .= '.';
+    $namaFileBaru .= $ekstensiGambar;
+
+    move_uploaded_file($tmpName, "../Gambar/" . $namaFileBaru);
+
+    return $namaFileBaru;
 }

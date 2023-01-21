@@ -1,8 +1,11 @@
 <?php
 require_once 'functions.php';
 
-if (isset($_POST['submit'])) : ?>
-    <?php
+if (isset($_POST['submit'])) {
+    // ketikkan vardump untuk melihat index arraynya
+    // var_dump($_POST);
+    // var_dump($_FILES);
+
     if (tambah($_POST) > 0) {
         echo "
     <script>
@@ -17,9 +20,9 @@ if (isset($_POST['submit'])) : ?>
     </script>
     ";
     }
+}
+?>
 
-    ?>
-<?php endif ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,32 +42,38 @@ if (isset($_POST['submit'])) : ?>
 
 <body>
     <h1>Tambah data mahasiswa</h1>
-    <form action="" method="post">
+    <!--
+        encytype digunakan untuk membuat jalur untuk
+        $_post untuk text dan $_file nya itu untuk file
+        jadi jika di vardump $_post maka input bertype file tidak akan ditampilkan atau dikelola
+    -->
+
+    <form action="" method="post" enctype="multipart/form-data">
         <table>
             <tr>
                 <td><label for="nama">Nama</label></td>
                 <td>:</td>
-                <td><input type="text" id="nama" name="nama"></td>
+                <td><input type="text" id="nama" name="nama" required></td>
             </tr>
             <tr>
                 <td><label for="nrp">NRP</label></td>
                 <td>:</td>
-                <td><input type="text" id="nrp" name="nrp"></td>
+                <td><input type="text" id="nrp" name="nrp" required></td>
             </tr>
             <tr>
                 <td><label for="email">Email</label></td>
                 <td>:</td>
-                <td><input type="email" id="email" name="email"></td>
+                <td><input type="email" id="email" name="email" required></td>
             </tr>
             <tr>
                 <td><label for="jurusan">Jurusan</label></td>
                 <td>:</td>
-                <td><input type="text" id="jurusan" name="jurusan"></td>
+                <td><input type="text" id="jurusan" name="jurusan" required></td>
             </tr>
             <tr>
                 <td><label for="gambar">Gambar</label></td>
                 <td>:</td>
-                <td><input type="text" id="gambar" name="gambar"></td>
+                <td><input type="file" id="gambar" name="gambar"></td>
             </tr>
             <tr>
                 <td><button type="submit" name="submit">Tambah Data!</button></td>
